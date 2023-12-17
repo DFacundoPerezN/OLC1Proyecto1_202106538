@@ -101,13 +101,15 @@ Con esta funcion se ingoran los comentarios presentes para evitar errores.
 ```
 </details>
 
-## Errores Lexicos de Statpy
+## Errores Lexicos 
 <details> 
 <summary> Descripcion</summary>
-Recorre el texto ingresado y lee caracter por caracter buscando uno inválido el cual agrega una linea a la tabla en HTML.
+Recorre el texto ingresado y lee caracter por caracter buscando uno inválido el cual agrega una linea a la tabla en HTML y preparando un texto para sacar por consola.
 
 ```Java
-  static String erroresLexicosStatPy(String texto){
+    static String[] erroresLexicos(String texto){
+        String consola ="";
+        
         String[] lineas = texto.split("\n");
         String html = inicioHTML;
         html +="\n\t<tr style=\"background-color: skyblue\">";
@@ -117,32 +119,25 @@ Recorre el texto ingresado y lee caracter por caracter buscando uno inválido el
         "\t\t<td>Columna</td>";
         html +="</tr>";
         
-        for (int j=0; j< lineas.length; j++){   
-            //lineas[j] = lineas[j].replaceAll("	", "  "); //Representa la linea/columna del texto ingresado
-            //
+        for (int j=0; j< lineas.length; j++){    
             for(int i=0; i< lineas[j].length(); i++){
                 if (!Character.isDigit(lineas[j].charAt(i)) && !Character.isAlphabetic(lineas[j].charAt(i)) 
-                    && lineas[j].charAt(i)!='"' && lineas[j].charAt(i)!=' ' && lineas[j].charAt(i)!='\\'
-                    && lineas[j].charAt(i)!='/' && lineas[j].charAt(i)!='{' && lineas[j].charAt(i)!='}'
-                    && lineas[j].charAt(i)!='.' && lineas[j].charAt(i)!=':' && lineas[j].charAt(i)!=','
-                    && lineas[j].charAt(i)!='\t' && lineas[j].charAt(i)!='+' && lineas[j].charAt(i)!='*'
-                    && lineas[j].charAt(i)!='=' && lineas[j].charAt(i)!='(' && lineas[j].charAt(i)!=')'
-                    && lineas[j].charAt(i)!='<' && lineas[j].charAt(i)!='>' && lineas[j].charAt(i)!=';'
-                    && lineas[j].charAt(i)!='$' && lineas[j].charAt(i)!='[' && lineas[j].charAt(i)!=']'){
+                    && ( 32 > lineas[j].charAt(i) ||  126 < lineas[j].charAt(i)) ){
                     html +="\n\t<tr>";
                     html +="\n\t\t<td>"+lineas[j].charAt(i)+"</td>\n" +
                     "\t\t<td>Error Léxico</td>\n" +
                     "\t\t<td>"+j+"</td>\n" +
                     "\t\t<td>"+i+"</td>";
                     html +="</tr>";
-                    //System.out.println(lineas[j]);
-                    System.out.println("Error en la fila "+(j) +" y columna "+i+" :"+lineas[j].charAt(i));
+                    
+                    System.out.println("Error: "+lineas[j].charAt(i)+ "en la fila "+(j) +" y columna "+i);
+                    consola+="Error: \""+lineas[j].charAt(i)+ "\" en la fila "+(j) +" y columna "+i+"\n";
                 }
             }
         }
         html +=finalHTML;
-        return html;
-    }
+        return new String[] {html, consola};
+    }    
 ```
 </details>
 
@@ -203,34 +198,113 @@ Con las herramientas de JFlex y Jcup realiza un analizis lexico el cual devuelve
 </details>
 
 
-## Traduccion de StatPy a Python
+## Creacion del AFN con Thompson 
 <details>
 <summary> Descripcion </summary>
-
-Con las herramientas de JFlex y Jcup realiza un analizis sintactico el cual devuelve una lista que tiene todas las traducciones hechas para que se devuelvan y el programa lo imprime en el area de texto de la interfaz.
+Se aprovecha la estructura de un arbol para realizar una pusqueda pre order y asi crear el texto para la elaboracion del grafo del AFN con Thompson
 ```Java
-    static String Traducir(String texto){
-        String result = "";
-        
-        texto= reemplazarComentarios(texto);
-        Scanner lexico  = new Scanner(new BufferedReader( new StringReader(texto)));
-        Parser sintactico =new Parser(lexico);
-        
-        try {   
-            //Se ejecuta el lexico y sintactico.
+    public String graphvizThompson(int contador){
+        String salida="";
+
+        int aumento;
+        int aumento2;
+        switch(this.dato){
+            case ".": 
+                salida+=hijos.get(0).graphvizThompson(contador);
+                contador=contador+hijos.get(0).aumentoContador();
+                salida+=hijos.get(1).graphvizThompson(contador);
+                
+
+            break;
             
-            sintactico.parse();
+            case "|": 
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                salida+=hijos.get(0).graphvizThompson(contador+1);
+                aumento = hijos.get(0).aumentoContador();
+                
+                salida+= Integer.toString(contador)+" -> "+ Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";
+                
+                salida+=hijos.get(1).graphvizThompson(contador+aumento+2);                 
+                aumento2 = hijos.get(1).aumentoContador();
+                
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+aumento+aumento2+3)+"[label=\"ε\"];\n";
+                salida+=Integer.toString(contador+aumento+aumento2+2)+" -> "+Integer.toString(contador+aumento+aumento2+3)+"[label=\"ε\"];\n";
+                
+            break;
             
-            for (int i = 0; i < sintactico.salidas.size(); i++) {
-                result += sintactico.salidas.get(i) + '\n';
-            }
-        }catch (Exception ex) {
-            //Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Error fatal en compilación de entrada.");
+            case "*": 
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                
+                salida+=hijos.get(0).graphvizThompson(contador+1);
+                aumento = hijos.get(0).aumentoContador();
+                
+
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";
+
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";                
+            break;
+            
+            case "+": 
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                
+                salida+=hijos.get(0).graphvizThompson(contador+1);
+                aumento = hijos.get(0).aumentoContador();
+                
+
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";
+            break;
+            
+            case "?": 
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+1)+"[label=\"ε\"];\n";
+                
+                salida+=hijos.get(0).graphvizThompson(contador+1);
+                aumento = hijos.get(0).aumentoContador();
+                
+                salida+=Integer.toString(contador+aumento+1)+" -> "+Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";               
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+aumento+2)+"[label=\"ε\"];\n";                
+            break;
+            
+            default:                 
+                //contador=contador+hijos.get(0).aumentoContador();
+                salida+=Integer.toString(contador)+" -> "+Integer.toString(contador+1)+"[label=\""+this.dato+"\"];\n";
+            break;
         }
         
-        return result;
+        return salida;
     }
+
+```
+```
+</details>
+
+## Cerradura metodo de subconjuntos
+<details>
+<summary> Descripcion </summary>
+Una cerradura en el metodo de conjutnos es la lista de todos los estados a los que se puede llegar con un grupo de estados utilizando epsilon (a la lista se incluyen estos mismos estados)
+```Java
+    public List cerradura(List<String> movimientos){
+        List cerradura = movimientos;
+        //System.out.println("cantidad de movimeintos dentro de esta cerradura: "+movimientos.size());        
+        this.cerraduraActual = cerradura;
+        String estadoInicial;
+        for (int i=0; i<movimientos.size(); i++){  
+            estadoInicial = movimientos.get(i);
+            
+            System.out.println("Buscando cerradura del estado: "+ estadoInicial);
+            //cerradura.addAll(estadosAlcanzables("ε",estadoInicial));
+            cerradura = agregarTodos(cerradura, estadosAlcanzables("ε",estadoInicial));   //agrego a la cerradura todos los estados con los que el estado puede llegar con epsilon                 
+            this.cerraduraActual = cerradura;
+            
+            System.out.println("cerr("+movimientos.toString()+") = "+ cerradura.toString());
+        }       
+        System.out.println("++cerr("+movimientos.toString()+") = "+ cerradura.toString()+"\n");
+        
+        return cerradura;        
+    }
+
+```
 ```
 </details>
 
@@ -271,7 +345,7 @@ DECIMALES=[0-9]+("."[  |0-9]+)?
 //Reglas Semanticas
 //Palabras reservadas
 %%
-"void" {  
+"conj" {  
     System.out.println("Reconocio PR: "+yytext()); 
     lexemas.add( new Lexema(yytext(),"Palabra Reservada",yyline,yychar));
     return new Symbol(sym.PR_VOID,yyline,yychar,yytext());}   
@@ -288,9 +362,6 @@ DECIMALES=[0-9]+("."[  |0-9]+)?
 }
 
 //Aciones con palabras reservadas
-{BOOL} {System.out.println("Reconocio BOOL: "+yytext());  
-    lexemas.add( new Lexema(yytext(),"Boolean",yyline,yychar));
-    return new Symbol(sym.BOOLEANO,yyline,yychar, yytext());} 
 {ID} {System.out.println("Reconocio ID: "+yytext());    
     lexemas.add( new Lexema(yytext(),"ID",yyline,yychar));
     return new Symbol(sym.ID,yyline,yychar, yytext()); } 
@@ -318,37 +389,51 @@ import java.util.Map;
 // 2. Codigo para el parser, variables, metodos 
 parser code 
 {:
-    //Clases, objetos, variables, lista, etc... en sintaxis java    
-    //Creo una lista de tipo String llamada 'salidas', donde guardare cada uno de las salidas analizadas
-    //Para el proyecto se sugiere HashMap
-    public List<String> salidas = new ArrayList<String>();
-    public Map<String, Double> mapaDouble = new HashMap<>();    
-    public Map<String, String> mapaString = new HashMap<>();
+    //Clases, objetos, variables, lista, etc... en sintaxis java
+    
+public void CrearAutomatas(Arbol arbolActualito, String nombreArchivo){
+
+        String infografo = arbolActualito.graphvizThompson(0) ; //Se saca la informacion del grafo 
+        arbolActualito.crearTransitions(infografo);              //Con esta misma informacion(String) se hace la lista de transiciones
+
+        String dataArchivo = "digraph G { \n graph[layout = dot, rankdir = LR] \n\n"+ infografo + arbolActualito.graphvizEstadoAceptacion()+"}"; // es necesario que haga lo de estados de aceptacion
+        System.out.println(dataArchivo);
+        GuardarArchivo.Graph("Thompson\\"+nombreArchivo, dataArchivo);
+
+        Automata momento = new Automata(arbolActualito.transiciones, arbolActualito.Lexemas(), arbolActualito.estadoAceptacion);
+        infografo = momento.metodoSubconjuntos(); //guardamos la base del grafo del AFD en 'infografo'
+        dataArchivo = "digraph G { \n graph[layout = dot, rankdir = LR] \n\n"+ infografo +"}"; //Se arregla para el graphviz 
+        GuardarArchivo.Graph("AFD\\"+nombreArchivo, dataArchivo);
+}
+
 :} 
 
 // 3. Terminales 
 terminal String PTCOMA,PARIZQ,PARDER,LLAVDER,LLAVIZQ,CORDER,CORIZQ,IGUAL,PUNTO,COMA, DOSPUNTOS, DOLLAR;
 
 // 4. No Terminales
-non terminal ini, entradas;
-non terminal sentencias, sentencia;
+non terminal ini, estructura;
+non terminal conjuntos, conjunto;
 
 // 5. Precedencias
 precedence left MAS,MENOS,COMA;
-precedence left POR,DIVIDIDO;
+precedence left POR;
+precedence left AND,OR;
 
 // 6. Producciones
 start with ini; 
-ini::= entradas
+ini::= LLAVIZQ estructura LLAVDER
 ;
 
-entradas ::= PR_VOID PR_MAIN PARIZQ PARDER LLAVIZQ sentencias:a LLAVDER
-            {: String salida="def main() :{\n " + a + "\n} f__name__ = “__main__”: \nmain()";
-                RESULT=salida; 
-                salidas.add(salida);:}
-            |archivo_json:a {:RESULT=a; salidas.add(""+a);:}
+estructura ::= conjuntos expresiones
+            {: String salida="def main() :{\n " + "" + "";  RESULT=salida;  salidas.add(salida);:}
             
 ;
 
+conjuntos ::= conjunto PTCOMA 
+            | conjuntos conjunto PTCOMA 
+;
+
+```
 ```
 </details>
