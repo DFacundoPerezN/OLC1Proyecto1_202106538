@@ -44,7 +44,3 @@ en la carpeta de reportes hay una carpeta de Thompson y otra de AFD en la cual s
 ![imagen](https://github.com/DFacundoPerezN/OLC1Proyecto1_202106538/assets/98927736/a3649fa2-7c3e-4ddc-8dd5-bd4cf3b8646c)
 
 
-
-## Generar Graficas
-Cuando es presionado el botono "Ejecutar" se abre una ventana en la cual se debe elegir cual boton presionar para que salga una grafica de barras y/o una grafica de Pie.
-![imagen](https://github.com/DFacundoPerezN/-OLC1-Proyecto1_202106538/assets/98927736/cbfa2310-9df5-4355-a93d-d82ffea67e1c)
