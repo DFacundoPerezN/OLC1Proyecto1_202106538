@@ -33,23 +33,10 @@ public class Proyecto1OLC1 {
 "}";
     
         System.out.println("----------New try----------------");
-        //String htmlE = AnalizadorLexico.erroresLexicos(t);
-        //String htmlL = AnalizadorLexico.ReporteLexemas(t);
+        //String htmlE = AnalizadorLexico.erroresLexicos(t)[0];
                   
         //ArrayList lista = rangeToArraylist("*~/");
 
     }
-    public static ArrayList rangeToArraylist(String range){
-        char start = range.charAt(0);
-        char end = range.charAt(2);
-        int first = (int)start;
-        int last = (int)end;
-        
-        ArrayList array = new ArrayList();
-        
-        for(int i=first; i<=last ;i++){
-            array.add(Character.toString(i));
-        }
-        return array;        
-    }
+
 }

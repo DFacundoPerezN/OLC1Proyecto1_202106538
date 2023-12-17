@@ -1,0 +1,16 @@
+digraph G { 
+ graph[layout = dot, rankdir = LR] 
+
+0 -> 1[label="digito"];
+1 -> 2[label="ε"];
+2 -> 3[label="\".\""];
+3 -> 2[label="ε"];
+3 -> 4[label="ε"];
+1 -> 4[label="ε"];
+4 -> 5[label="ε"];
+5 -> 6[label="digito"];
+6 -> 5[label="ε"];
+6 -> 7[label="ε"];
+7[shape="doublecircle"];
+}
+}

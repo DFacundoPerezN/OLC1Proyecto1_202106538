@@ -33,6 +33,20 @@ public void agregarValor(String a){
         }
 }
 
+    public ArrayList rangeToArraylist(String range){
+        char start = range.charAt(0);
+        char end = range.charAt(2);
+        int first = (int)start;
+        int last = (int)end;
+        
+        ArrayList array = new ArrayList();
+        
+        for(int i=first; i<=last ;i++){
+            array.add(Character.toString(i));
+        }
+        return array;        
+    }
+
 public void CrearAutomatas(Arbol arbolActualito, String nombreArchivo){
 
         String infografo = arbolActualito.graphvizThompson(0) ; //Se saca la informacion del grafo 
@@ -97,8 +111,10 @@ conjuntos ::= conjunto PTCOMA
             | conjuntos conjunto PTCOMA 
 ;
 
-conjunto ::= PR_CONJ DOSPUNTOS ID EQUALS lista
-            | PR_CONJ DOSPUNTOS ID EQUALS rango
+conjunto ::= PR_CONJ DOSPUNTOS ID:a EQUALS lista:b 
+            {: String conjunto = a+"= {"+b+"}" ; System.out.println(conjunto); RESULT= conjunto; :}
+            | PR_CONJ DOSPUNTOS ID:a EQUALS rango:b
+            {: String conjunto = a+"= "+rangeToArraylist((String) b).toString() ; System.out.println(conjunto); RESULT= conjunto; :}
 ;
 
 rango ::= simbolo:a VIRGUILLA simbolo:c {:String rango=a+"~"+c; RESULT= rango;:}
@@ -112,7 +128,7 @@ simbolo ::= SYMBOL:a    {:RESULT= a;:}
 ;
 
 lista ::= simbolo:a {:RESULT= a;:}
-            | simbolo COMA lista
+            | lista:a COMA simbolo:b {: String lista = (String) a+ ", "+ (String) b ; RESULT = lista; :}
 ;
 
 expresiones ::= expresion PTCOMA

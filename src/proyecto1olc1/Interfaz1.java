@@ -211,8 +211,11 @@ public class Interfaz1 extends javax.swing.JFrame {
         System.out.println();
         //jTextArea2.setText(jTextArea1.getText());
         String texto = AnalizadorLexico.reemplazarComentarios(jTextArea1.getText());
-        String contenido;
-        contenido = AnalizadorLexico.erroresLexicos(texto);
+        String contenido, consola;
+        consola = AnalizadorLexico.erroresLexicos(texto)[1];
+        jTextArea2.setText(consola);
+        
+        contenido = AnalizadorLexico.erroresLexicos(texto)[0];
         GuardarArchivo.writeToFile("Reportes/Errores.html", contenido);
         
         contenido = AnalizadorLexico.ReporteLexemas(texto);

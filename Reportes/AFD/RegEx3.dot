@@ -1,0 +1,22 @@
+digraph G { 
+ graph[layout = dot, rankdir = LR] 
+
+q0 -> q1[label="digito"];
+q1 -> q2[label="digito"];
+q1 -> q3[label="_"];
+q1 -> q4[label="letra"];
+q2 -> q2[label="digito"];
+q2 -> q3[label="_"];
+q2 -> q4[label="letra"];
+q3 -> q2[label="digito"];
+q3 -> q3[label="_"];
+q3 -> q4[label="letra"];
+q4 -> q2[label="digito"];
+q4 -> q3[label="_"];
+q4 -> q4[label="letra"];
+q1[shape="doublecircle"]
+q2[shape="doublecircle"]
+q3[shape="doublecircle"]
+q4[shape="doublecircle"]
+}
+}

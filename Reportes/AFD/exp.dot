@@ -1,0 +1,12 @@
+digraph G { 
+ graph[layout = dot, rankdir = LR] 
+
+q0 -> q1[label="digito"];
+q1 -> q2[label="digito"];
+q1 -> q3[label="\".\""];
+q2 -> q2[label="digito"];
+q3 -> q2[label="digito"];
+q3 -> q3[label="\".\""];
+q2[shape="doublecircle"]
+}
+}

@@ -39,7 +39,9 @@ public class AnalizadorLexico {
     
     static String finalHTML ="\n</table>"+"\n</html>";
     
-    static String erroresLexicos(String texto){
+    static String[] erroresLexicos(String texto){
+        String consola ="";
+        
         String[] lineas = texto.split("\n");
         String html = inicioHTML;
         html +="\n\t<tr style=\"background-color: skyblue\">";
@@ -52,9 +54,7 @@ public class AnalizadorLexico {
         for (int j=0; j< lineas.length; j++){    
             for(int i=0; i< lineas[j].length(); i++){
                 if (!Character.isDigit(lineas[j].charAt(i)) && !Character.isAlphabetic(lineas[j].charAt(i)) 
-                    && lineas[j].charAt(i)!='"'&& lineas[j].charAt(i)!=' '&& lineas[j].charAt(i)!='\\'
-                    && lineas[j].charAt(i)!='/'&& lineas[j].charAt(i)!='{'&& lineas[j].charAt(i)!='}'
-                    && lineas[j].charAt(i)!='.'&& lineas[j].charAt(i)!=':'&& lineas[j].charAt(i)!=','&& lineas[j].charAt(i)!='\t'){
+                    && ( 32 > lineas[j].charAt(i) ||  126 < lineas[j].charAt(i)) ){
                     html +="\n\t<tr>";
                     html +="\n\t\t<td>"+lineas[j].charAt(i)+"</td>\n" +
                     "\t\t<td>Error Léxico</td>\n" +
@@ -63,17 +63,19 @@ public class AnalizadorLexico {
                     html +="</tr>";
                     
                     System.out.println("Error: "+lineas[j].charAt(i)+ "en la fila "+(j) +" y columna "+i);
+                    consola+="Error: \""+lineas[j].charAt(i)+ "\" en la fila "+(j) +" y columna "+i+"\n";
                 }
             }
         }
         html +=finalHTML;
-        return html;
+        return new String[] {html, consola};
     }    
     /*
     */
     
     static String ReporteLexemas(String texto){
         String html = inicioHTML;
+        
         html +="\n\t<tr style=\"background-color: hotpink\">";
         html +="\n\t<td>Lexema</td>\n" +
         "\t\t<td>Token</td>\n" +
@@ -166,6 +168,5 @@ public class AnalizadorLexico {
                 tabulaciones+="\t";
             }
             return tabulaciones;
-        }
-    
+        }    
 }
