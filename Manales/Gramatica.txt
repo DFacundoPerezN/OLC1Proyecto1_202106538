@@ -1,0 +1,28 @@
+ID = [A-Za-z_][A-Za-z0-9_]*
+element = [A-Za-z0-9_]|[\x20-\x7E]
+
+<estructura> ::= "{" <conjuntos> <expresiones> "}"
+
+<conjuntos> ::= <conjunto> ";" [<conjuntos>]
+
+
+<conjunto> ::= "CONJ" ":" ID "->" <rango> 
+		| "CONJ" ":" ID "->" <lista> 
+
+<rango> ::= Element "~" Element
+	| Element "-" Element
+
+<lista> ::= Element ["," lista]
+
+<expresiones> ::= <expresion> ";" [<expresiones>]
+
+<expresion> ::= ID "->" <expresion_en_prefijo> 
+
+<expresion_en_prefijo> ::= "." <componente> <componente>
+			| "|" <componente> <componente>
+			| "*" <componente> 
+			| "+" <componente> 
+			| "?" <componente> 
+
+<componente> :== "(" ID ")"
+		| <expresion_en_prefijo>

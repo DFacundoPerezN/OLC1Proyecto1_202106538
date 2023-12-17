@@ -1,0 +1,17 @@
+digraph G { 
+ graph[layout = dot, rankdir = LR] 
+
+0 -> 1[label="dig"];
+1 -> 2[label="dig"];
+2 -> 3[label="dig"];
+3 -> 4[label="\".\""];
+4 -> 5[label="dig"];
+5 -> 6[label="dig"];
+6 -> 7[label="dig"];
+7 -> 8[label="\".\""];
+8 -> 9[label="dig"];
+9 -> 10[label="dig"];
+10 -> 11[label="dig"];
+11[shape="doublecircle"];
+}
+}

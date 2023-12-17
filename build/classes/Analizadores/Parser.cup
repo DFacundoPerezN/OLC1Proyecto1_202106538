@@ -1,0 +1,155 @@
+/* 1. Package e importaciones */
+package Analizadores; 
+import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import Estructuras.Arbol;
+import Estructuras.Automata;
+import proyecto1olc1.GuardarArchivo;
+
+// 2. Codigo para el parser, variables, metodos 
+parser code 
+{:
+    //Clases, objetos, variables, lista, etc... en sintaxis java    
+    //Creo una lista de tipo String llamada 'salidas', donde guardare cada uno de las salidas analizadas
+    //Para el proyecto se sugiere HashMap
+    public List<String> salidas = new ArrayList<String>();
+    public Map<String, Double> mapaDouble = new HashMap<>();    
+    public Map<String, String> mapaString = new HashMap<>();
+
+    public List<Double> valores = new ArrayList<>();
+
+
+public void agregarValor(String a){
+    try {   
+           double decimal = Double.parseDouble(a);
+           valores.add(decimal);
+        }catch (Exception ex) {
+            System.out.println("Error al recibir valor, se ingresara un 0");
+            valores.add(0.0);
+        }
+}
+
+public void CrearAutomatas(Arbol arbolActualito, String nombreArchivo){
+
+        String infografo = arbolActualito.graphvizThompson(0) ; //Se saca la informacion del grafo 
+        arbolActualito.crearTransitions(infografo);              //Con esta misma informacion(String) se hace la lista de transiciones
+
+        String dataArchivo = "digraph G { \n graph[layout = dot, rankdir = LR] \n\n"+ infografo + arbolActualito.graphvizEstadoAceptacion()+"}"; // es necesario que haga lo de estados de aceptacion
+        System.out.println(dataArchivo);
+        GuardarArchivo.Graph("Thompson\\"+nombreArchivo, dataArchivo);
+
+        Automata momento = new Automata(arbolActualito.transiciones, arbolActualito.Lexemas(), arbolActualito.estadoAceptacion);
+        infografo = momento.metodoSubconjuntos(); //guardamos la base del grafo del AFD en 'infografo'
+        dataArchivo = "digraph G { \n graph[layout = dot, rankdir = LR] \n\n"+ infografo +"}"; //Se arregla para el graphviz 
+        GuardarArchivo.Graph("AFD\\"+nombreArchivo, dataArchivo);
+}
+
+:} 
+
+// 3. Terminales 
+terminal String PTCOMA,PARIZQ,PARDER,LLAVDER,LLAVIZQ,CORDER,CORIZQ,IGUAL,PUNTO,COMA, DOSPUNTOS, DOLLAR;
+terminal String MAS,MENOS,POR;
+terminal String EQUALS;
+terminal String LETRA;
+terminal String AND,OR,NOT;
+terminal String DIGITO;
+terminal String ID;
+terminal String SYMBOL;
+terminal String UNKNOWN;
+terminal String COMDOBLES;
+terminal String CHAREX;
+terminal String VIRGUILLA;
+terminal String PR_CONJ;
+terminal String vacio;
+
+// 4. No Terminales
+non terminal ini, estructura;
+non terminal conjuntos, conjunto;
+non terminal expresion, expresiones;
+non terminal rango;
+non terminal expresion_en_prefijo;
+non terminal lista;
+non terminal simbolo;
+non terminal elementos, elemento ;
+non terminal componente;
+non terminal miembro;
+
+// 5. Precedencias
+precedence left MAS,MENOS,COMA;
+precedence left POR;
+precedence left AND,OR;
+
+// 6. Producciones
+start with ini; 
+ini::= LLAVIZQ estructura LLAVDER
+;
+
+estructura ::= conjuntos expresiones
+            {: String salida="def main() :{\n " + "" + "";  RESULT=salida;  salidas.add(salida);:}
+            
+;
+
+conjuntos ::= conjunto PTCOMA 
+            | conjuntos conjunto PTCOMA 
+;
+
+conjunto ::= PR_CONJ DOSPUNTOS ID EQUALS lista
+            | PR_CONJ DOSPUNTOS ID EQUALS rango
+;
+
+rango ::= simbolo:a VIRGUILLA simbolo:c {:String rango=a+"~"+c; RESULT= rango;:}
+           |simbolo:a MENOS simbolo:c {:String rango=a+"-"+c; RESULT= rango;:}
+;
+
+simbolo ::= SYMBOL:a    {:RESULT= a;:}
+        | LETRA:a       {:RESULT= a;:}
+        | DIGITO:a      {:RESULT= a;:}
+        | POR:a         {:RESULT= a;:}
+;
+
+lista ::= simbolo:a {:RESULT= a;:}
+            | simbolo COMA lista
+;
+
+expresiones ::= expresion PTCOMA
+            | expresiones expresion PTCOMA
+;
+
+expresion ::= ID:nombre EQUALS expresion_en_prefijo:b    
+                {:Arbol actualito = ((Arbol) b); 
+                CrearAutomatas(actualito, nombre);
+                RESULT= b;:}
+;
+
+expresion_en_prefijo ::= PUNTO:a componente:b componente:c  
+                            {:Arbol actual= new Arbol(a); actual.addHijo((Arbol) b); actual.addHijo((Arbol) c); RESULT = actual;:}
+			| OR:a componente:b componente:c    
+                            {:Arbol actual= new Arbol(a); actual.addHijo((Arbol) b); actual.addHijo((Arbol) c); RESULT = actual;:}
+			| POR:a componente:b    
+                            {:Arbol actual= new Arbol(a); actual.addHijo((Arbol) b); RESULT = actual;:}
+			| MAS:a componente:b   
+                            {:Arbol actual= new Arbol(a); actual.addHijo((Arbol) b); RESULT = actual;:}
+			| UNKNOWN:a componente:b 
+                            {:Arbol actual= new Arbol(a); actual.addHijo((Arbol) b); RESULT = actual;:}
+;
+
+componente ::= PARIZQ ID:a PARDER {:RESULT= new Arbol(a);:}
+                | CHAREX:a  {:RESULT= new Arbol(a.replace("\"","\\\""));:}
+                | SYMBOL:a  {:RESULT= new Arbol(a);:}
+		| expresion_en_prefijo:a    {:RESULT=a;:}
+                | LETRA:a   {:RESULT= new Arbol(a);:}
+                | DIGITO:a  {:RESULT= new Arbol(a);:}
+;
+
+/*
+
+| f:a {:RESULT=a;:}
+f ::= ENTERO:a {:RESULT=a;:}
+     |DECIMAL:a {:RESULT=a;:}
+     
+     |BOOLEANO:a {:RESULT=a;:}
+;*/

@@ -1,0 +1,19 @@
+digraph G { 
+ graph[layout = dot, rankdir = LR] 
+
+q0 -> q1[label="w"];
+q1 -> q2[label="w"];
+q2 -> q3[label="w"];
+q3 -> q4[label="\".\""];
+q4 -> q5[label="letra"];
+q5 -> q6[label="\".\""];
+q5 -> q7[label="letra"];
+q6 -> q8[label="letra"];
+q7 -> q6[label="\".\""];
+q7 -> q7[label="letra"];
+q8 -> q9[label="letra"];
+q9 -> q9[label="letra"];
+q8[shape="doublecircle"]
+q9[shape="doublecircle"]
+}
+}
