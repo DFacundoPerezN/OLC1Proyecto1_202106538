@@ -25,7 +25,7 @@ Se puede editar solo en el área de texto de la izquierda.
 ## Reportes
 Con el botón de “Reportes” se generarán dos archivos HTML los cuales son tablas de los lexemas que se leen del archivo asi como sus errores lexicos. 
 Pero antes se tiene que selecionar el tipo de archivo que se esta analizando.
-![imagen](https://github.com/DFacundoPerezN/-OLC1-Proyecto1_202106538/assets/98927736/5b823126-1744-46c0-85f7-541a69c60680)
+
 
 ### Tabla de Tokens/Lexemas
 En esta table en HTML se mostraran la tabla de lexemas. 
